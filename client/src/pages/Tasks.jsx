@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
 import { useParams } from "react-router-dom";
@@ -9,9 +9,10 @@ import { IoMdAdd } from "react-icons/io";
 import Tabs from "../components/Tabs";
 import TaskTitle from "../components/TaskTitle";
 import BoardView from "../components/BoardView";
-import { tasks } from "../assets/data";
+// import { tasks } from "../assets/data";
 import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
+import { useGetTaskMutation } from "../redux/slices/apiSlice";
 
 const TABS = [
   { title: "Board View", icon: <MdGridView /> },
@@ -30,8 +31,26 @@ const Tasks = () => {
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [tasks, setTasks] = useState([]);
   const status = params?.status || "";
+
+  const [getTasks] = useGetTaskMutation();
+
+  const fetchTasks = async () => {
+    setLoading(true);
+    try {
+      const result = await getTasks().unwrap();
+      setTasks(result.tasks);
+    } catch (error) {
+      console.error("Failed to fetch tasks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [getTasks]);
 
   return loading ? (
     <div className="py-10">
@@ -60,15 +79,12 @@ const Tasks = () => {
               label="In Progress"
               className={TASK_TYPE["in progress"]}
             />
-            <TaskTitle
-              label="Completed"
-              className={TASK_TYPE.completed}
-            />
+            <TaskTitle label="Completed" className={TASK_TYPE.completed} />
           </div>
         )}
 
         {selected !== 1 ? (
-          <BoardView tasks={tasks} />
+          <BoardView tasks={tasks} status={status} />
         ) : (
           <div className="w-full">
             <Table tasks={tasks} />
@@ -76,7 +92,7 @@ const Tasks = () => {
         )}
       </Tabs>
 
-      <AddTask open={open} setOpen={setOpen} />
+      <AddTask open={open} setOpen={setOpen} fetchTasks={fetchTasks} />
     </div>
   );
 };

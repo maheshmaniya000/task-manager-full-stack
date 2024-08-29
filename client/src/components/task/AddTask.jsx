@@ -7,13 +7,16 @@ import UserList from "./UserList";
 import SelectList from "../SelectList";
 import { BiImages } from "react-icons/bi";
 import Button from "../Button";
+import { useDispatch, useSelector } from "react-redux";
+import { useCreateTaskMutation } from "../../redux/slices/apiSlice";
+import { addTask, setStatus, setError } from "../../redux/slices/taskSlice";
 
 const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
 const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"];
 
 const uploadedFileURLs = [];
 
-const AddTask = ({ open, setOpen }) => {
+const AddTask = ({ open, setOpen, fetchTasks }) => {
   const task = "";
 
   const {
@@ -21,17 +24,41 @@ const AddTask = ({ open, setOpen }) => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
   const [team, setTeam] = useState(task?.team || []);
-  const [stage, setStage] = useState(
-    task?.stage?.toUpperCase() || LISTS[0]
-  );
+  const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0]);
   const [priority, setPriority] = useState(
     task?.priority?.toUpperCase() || PRIORIRY[2]
   );
   const [assets, setAssets] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const { user } = useSelector((state) => state.auth);
 
-  const submitHandler = () => {};
+  const dispatch = useDispatch();
+  const [createTask] = useCreateTaskMutation();
+
+  const submitHandler = async (data) => {
+    const taskData = {
+      ...data,
+      userId: user?._id,
+      team,
+      stage,
+      priority,
+      assets: null,
+    };
+
+    try {
+      dispatch(setStatus("loading"));
+      const response = await createTask(taskData).unwrap();
+      dispatch(addTask(response.task));
+      dispatch(setStatus("succeeded"));
+      fetchTasks();
+      setOpen(false);
+    } catch (error) {
+      dispatch(setError(error.message));
+      dispatch(setStatus("failed"));
+    }
+  };
 
   const handleSelect = (e) => {
     setAssets(e.target.files);
@@ -55,9 +82,7 @@ const AddTask = ({ open, setOpen }) => {
               name="title"
               label="Task Title"
               className="w-full rounded"
-              register={register("title", {
-                required: "Title is required",
-              })}
+              register={register("title", { required: "Title is required" })}
               error={errors.title ? errors.title.message : ""}
             />
 
@@ -78,9 +103,7 @@ const AddTask = ({ open, setOpen }) => {
                   name="date"
                   label="Task Date"
                   className="w-full rounded"
-                  register={register("date", {
-                    required: "Date is required!",
-                  })}
+                  register={register("date", { required: "Date is required!" })}
                   error={errors.date ? errors.date.message : ""}
                 />
               </div>
@@ -103,9 +126,9 @@ const AddTask = ({ open, setOpen }) => {
                     type="file"
                     className="hidden"
                     id="imgUpload"
-                    onChange={(e) => handleSelect(e)}
+                    onChange={handleSelect}
                     accept=".jpg, .png, .jpeg"
-                    multiple={true}
+                    multiple
                   />
                   <BiImages />
                   <span>Add Assets</span>
@@ -113,7 +136,7 @@ const AddTask = ({ open, setOpen }) => {
               </div>
             </div>
 
-            <div className=" pt-6 sm:flex sm:flex-row-reverse gap-4">
+            <div className="pt-6 sm:flex sm:flex-row-reverse gap-4">
               {uploading ? (
                 <span className="text-sm py-2 text-red-500">
                   Uploading assets
@@ -122,7 +145,7 @@ const AddTask = ({ open, setOpen }) => {
                 <Button
                   label="Submit"
                   type="submit"
-                  className="bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700  sm:w-auto"
+                  className="bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
                 />
               )}
 

@@ -64,11 +64,12 @@ export const loginUser = async (req, res) => {
     const isMatch = await user.matchPassword(password);
 
     if (user && isMatch) {
-      createJWT(res, user._id);
+      const token = createJWT(res, user._id);
 
       user.password = undefined;
 
-      res.status(200).json(user);
+      res.cookie('cookieName', 'cookieValue')
+      res.status(200).json({ user, token });
     } else {
       return res
         .status(401)
@@ -83,7 +84,7 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     res.cookie("token", "", {
-      htttpOnly: true,
+      httpOnly: true,
       expires: new Date(0),
     });
 
@@ -130,8 +131,8 @@ export const updateUserProfile = async (req, res) => {
       isAdmin && userId === _id
         ? userId
         : isAdmin && userId !== _id
-        ? _id
-        : userId;
+          ? _id
+          : userId;
 
     const user = await User.findById(id);
 
@@ -224,9 +225,8 @@ export const activateUserProfile = async (req, res) => {
 
       res.status(201).json({
         status: true,
-        message: `User account has been ${
-          user?.isActive ? "activated" : "disabled"
-        }`,
+        message: `User account has been ${user?.isActive ? "activated" : "disabled"
+          }`,
       });
     } else {
       res.status(404).json({ status: false, message: "User not found" });

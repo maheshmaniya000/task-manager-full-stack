@@ -3,7 +3,7 @@ import User from "../models/user.js";
 
 const protectRoute = async (req, res, next) => {
   try {
-    let token = req.cookies?.token;
+    let token = req.cookies?.token || req.headers.authorization;;
 
     if (token) {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -33,6 +33,7 @@ const protectRoute = async (req, res, next) => {
 };
 
 const isAdminRoute = (req, res, next) => {
+  console.log(req, "req")
   if (req.user && req.user.isAdmin) {
     next();
   } else {

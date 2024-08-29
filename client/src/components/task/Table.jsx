@@ -7,12 +7,7 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { toast } from "sonner";
-import {
-  BGS,
-  PRIOTITYSTYELS,
-  TASK_TYPE,
-  formatDate,
-} from "../../utils";
+import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../../utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
 import UserInfo from "../UserInfo";
@@ -53,10 +48,7 @@ const Table = ({ tasks }) => {
       <td className="py-2">
         <div className="flex items-center gap-2">
           <div
-            className={clsx(
-              "w-4 h-4 rounded-full",
-              TASK_TYPE[task.stage]
-            )}
+            className={clsx("w-4 h-4 rounded-full", TASK_TYPE[task.stage])}
           />
           <p className="w-full line-clamp-2 text-base text-black">
             {task?.title}
@@ -66,12 +58,7 @@ const Table = ({ tasks }) => {
 
       <td className="py-2">
         <div className={"flex gap-1 items-center"}>
-          <span
-            className={clsx(
-              "text-lg",
-              PRIOTITYSTYELS[task?.priority]
-            )}
-          >
+          <span className={clsx("text-lg", PRIOTITYSTYELS[task?.priority])}>
             {ICONS[task?.priority]}
           </span>
           <span className="capitalize line-clamp-1">

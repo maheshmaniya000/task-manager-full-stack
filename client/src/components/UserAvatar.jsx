@@ -5,6 +5,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getInitials } from "../utils";
+import { logout } from "../redux/slices/authSlice";
 
 const UserAvatar = () => {
   const [open, setOpen] = useState(false);
@@ -12,9 +13,10 @@ const UserAvatar = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  console.log(user, "user");
 
   const logoutHandler = () => {
-    console.log("logout");
+    dispatch(logout());
   };
 
   return (
@@ -24,7 +26,7 @@ const UserAvatar = () => {
           <div>
             <Menu.Button className="w-10 h-10 items-center justify-center rounded-full bg-blue-600">
               <span className="text-white font-semibold">
-                {getInitials(user?.name)}
+                {getInitials(user?.user.name)}
               </span>
             </Menu.Button>
           </div>
@@ -43,7 +45,7 @@ const UserAvatar = () => {
                 <Menu.Item>
                   {({ active }) => (
                     <button
-                      onClick={() => setOpen(true)}
+                      onClick={() => navigate("./profile")}
                       className="text-gray-700 px-4 group hover:bg-gray-100 flex w-full items-center py-2 text-base"
                     >
                       <FaUser className="mr-2" aria-hidden="true" />
@@ -58,10 +60,7 @@ const UserAvatar = () => {
                       onClick={() => setOpenPassword(true)}
                       className={`tetx-gray-700 px-4 group hover:bg-gray-100 flex w-full items-center py-2 text-base`}
                     >
-                      <FaUserLock
-                        className="mr-2"
-                        aria-hidden="true"
-                      />
+                      <FaUserLock className="mr-2" aria-hidden="true" />
                       Change Password
                     </button>
                   )}
@@ -73,10 +72,7 @@ const UserAvatar = () => {
                       onClick={logoutHandler}
                       className={`text-red-600 px-4 group hover:bg-gray-100 flex w-full items-center py-2 text-base`}
                     >
-                      <IoLogOutOutline
-                        className="mr-2"
-                        aria-hidden="true"
-                      />
+                      <IoLogOutOutline className="mr-2" aria-hidden="true" />
                       Logout
                     </button>
                   )}

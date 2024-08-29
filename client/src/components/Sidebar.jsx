@@ -58,9 +58,7 @@ const Sidebar = () => {
 
   const path = location.pathname.split("/")[1];
 
-  const sidebarLinks = user?.isAdmin
-    ? linkData
-    : linkData.slice(0, 5);
+  const sidebarLinks = user?.user?.isAdmin ? linkData : linkData.slice(0, 5);
 
   const closeSidebar = () => {
     dispatch(setOpenSidebar(false));
@@ -73,9 +71,7 @@ const Sidebar = () => {
         onClick={closeSidebar}
         className={clsx(
           "w-full  flex gap-2 px-5 py-2 items-center text-gray-800 text-base hover:bg-[#2564ed2d]",
-          path === el.link.split("/")[0]
-            ? "!bg-blue-700 text-neutral-100"
-            : ""
+          path === el.link.split("/")[0] ? "!bg-blue-700 text-neutral-100" : ""
         )}
       >
         {el.icon}

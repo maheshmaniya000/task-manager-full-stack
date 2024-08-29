@@ -36,21 +36,16 @@ const TaskCard = ({ task }) => {
             )}
           >
             <span className="text-lg">{ICONS[task?.priority]}</span>
-            <span className="uppercase">
-              {task?.priority} Priority
-            </span>
+            <span className="uppercase">{task?.priority} Priority</span>
           </div>
 
-          {user?.isAdmin && <TaskDialog task={task} />}
+          {user?.user.isAdmin && <TaskDialog task={task} />}
         </div>
 
         <>
           <div className="flex items-center gap-2 mb-2">
             <div
-              className={clsx(
-                "w-4 h-4 rounded-full",
-                TASK_TYPE[task.stage]
-              )}
+              className={clsx("w-4 h-4 rounded-full", TASK_TYPE[task.stage])}
             />
             <h4 className="line-clamp-1 text-black">{task?.title}</h4>
           </div>
@@ -118,7 +113,7 @@ const TaskCard = ({ task }) => {
         <div className="w-full">
           <button
             onClick={() => setOpen(true)}
-            disabled={user.isAdmin ? false : true}
+            disabled={user?.user.isAdmin ? false : true}
             className="w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled::text-gray-300"
           >
             <IoMdAdd className="text-lg" />
